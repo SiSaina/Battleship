@@ -156,8 +156,11 @@ bool Player::TakeTurn(Player& opponent, int startX, int startY) {
                 lastCol = col;
             }
 
+
         }
-        if (!isComputer) SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid or repeated target. Try again.", startX, startY + 1);
+        else if (!isComputer) {
+            SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid or repeated target. Try again.", startX, startY + 1);
+        }   
     }
     return opponent.HasLost();
 }
