@@ -122,7 +122,7 @@ bool Player::TakeTurn(Player& opponent, int startX, int startY) {
             GotoXY(startX, startY);
             cout << name << ", enter target coordinate (e.g., B7): ";
             cin >> coord;
-            ClearInputLine(CONSOLE_WIDTH, startX, startY);
+            ClearInputLine(CONSOLE_WIDTH - 50, startX, startY);
 
             if (!ParseCoordinate(coord, row, col)) {
                 SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid format. Try again.", startX, startY + 1);
@@ -136,17 +136,19 @@ bool Player::TakeTurn(Player& opponent, int startX, int startY) {
         valid = opponent.ownGrid.FireAt(row, col, hit, sunk, shipName); // TF: Function
         if (valid) {
             trackingGrid.MarkTrackingCell(row, col, hit);
-            ClearInputArea(CONSOLE_WIDTH, startX, startY + 1, 3);
+			ClearInputArea(CONSOLE_WIDTH, startX, startY + 1, 3);
             GotoXY(startX, startY + 2);
             cout << name << " fired at " << char('A' + col) << row + 1 << ": ";
-            ClearInputLine(CONSOLE_WIDTH, startX, startY + 1);
-            ClearInputLine(CONSOLE_WIDTH, startX, startY + 3);
-
+            
             if (hit) {
                 SetRgbLine(COLOUR_YELLOW_ON_BLACK, "Hit!", startX + 23, startY + 2);
                 if (sunk) {
-                    if (!isComputer) SetRgbLine(COLOUR_GREEN_ON_BLACK, "You sunk the " + shipName + "!", startX, startY + 3);
-                    else SetRgbLine(COLOUR_RED_ON_BLACK, "Opponent sunk your ship!", startX, startY + 3);
+                    if (!isComputer) {
+                        SetRgbLine(COLOUR_GREEN_ON_BLACK, "You sunk the " + shipName + "!", startX, startY + 1);
+                    }
+                    else {
+                        SetRgbLine(COLOUR_RED_ON_BLACK, "Opponent sunk your ship!", startX, startY + 3);
+                    }
                 }
             }
             else SetRgbLine(COLOUR_RED_ON_BLACK, "Miss.", startX + 23, startY + 2);
@@ -155,8 +157,6 @@ bool Player::TakeTurn(Player& opponent, int startX, int startY) {
                 lastRow = row;
                 lastCol = col;
             }
-
-
         }
         else if (!isComputer) {
             SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid or repeated target. Try again.", startX, startY + 1);
@@ -170,8 +170,27 @@ bool Player::HasLost() const {
 }
 
 void Player::ShowGrids(bool debugMode, int startX, int startY) const {
-    if (debugMode || !isComputer) {
-        int gridSpacing = GRID_SIZE * 2 + 6;
+    int gridSpacing = GRID_SIZE * 2 + 6;
+    if (debugMode) {
+        if(!isComputer) {
+            GotoXY(startX - 22, startY);
+            cout << name << "'s Own Grid:\n";
+            ownGrid.Display(true, startX - 23, startY + 1);
+            GotoXY(startX + gridSpacing - 22, startY);
+            cout << name << "'s Tracking Grid:\n";
+            trackingGrid.Display(false, startX + gridSpacing - 23, startY + 1);
+            return;
+        }
+        else {
+            GotoXY(startX + 17, startY);
+            cout << name << "'s Tracking Grid:\n";
+            trackingGrid.Display(false, startX + 16, startY + 1);
+            GotoXY(startX + gridSpacing + 17, startY);
+            cout << name << "'s Own Grid:\n";
+            ownGrid.Display(true, startX + gridSpacing + 16, startY + 1);
+        }
+    }
+    else if (!isComputer) {
         GotoXY(startX + 1, startY);
         cout << name << "'s Tracking Grid:\n";
         trackingGrid.Display(false, startX, startY + 1);

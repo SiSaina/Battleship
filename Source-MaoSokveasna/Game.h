@@ -13,7 +13,6 @@ private:
     void StartNewGame();
     void ToggleDebugMode();
     void ShowGameOver();
-    void DrawBorder(int width, int height) const;
 public:
     Game(); // TF: Constructor
     ~Game(); // TF: Destructor

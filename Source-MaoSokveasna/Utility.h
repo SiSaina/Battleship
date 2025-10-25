@@ -40,6 +40,7 @@ bool IsCoordinatorInputValid(const string& input); // TF: Function
 bool IsShipOutOfBound(int row, int col, int shipSize, bool horizontal); // TF: Function
 bool IsOrientationInputValid(char orientation); // TF: Function
 bool IsDirectionInputValid(char direction); // TF: Function
+void DrawBorder(int CONSOLE_WIDTH, int CONSOLE_HEIGHT);
 void ClearScreen();
 void GotoXY(int x, int y);
 // Clear a single line of input

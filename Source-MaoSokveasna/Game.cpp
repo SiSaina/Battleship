@@ -123,25 +123,3 @@ void Game::ShowGameOver() {
 	CenterTextColored("Press any key to return to menu...", 9, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
     system("pause > nul");
 }
-
-
-// Draw a bordered box around the game area
-void Game::DrawBorder(int CONSOLE_WIDTH, int CONSOLE_HEIGHT) const {
-    SetRgb(COLOUR_BLUE_ON_BLACK);
-    GotoXY(0, 0);
-    cout << char(201);
-    for (int i = 0; i < CONSOLE_WIDTH - 2; ++i) cout << char(205);
-    cout << char(187);
-    for (int i = 1; i < CONSOLE_HEIGHT - 1; ++i) {
-        GotoXY(0, i);
-        cout << char(186);
-        GotoXY(CONSOLE_WIDTH - 1, i);
-        cout << char(186);
-    }
-    GotoXY(0, CONSOLE_HEIGHT - 1);
-    cout << char(200);
-    for (int i = 0; i < CONSOLE_WIDTH - 2; ++i) cout << char(205);
-    cout << char(188);
-    SetRgb(COLOUR_WHITE_ON_BLACK);
-}
-
