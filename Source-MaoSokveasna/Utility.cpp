@@ -207,8 +207,8 @@ void CenterTextColored(const string& text, int row, int totalWidth, EColour colo
     SetRgb(COLOUR_WHITE_ON_BLACK); // reset color
 }
 static void ShowInputError(const string& message, int x, int y) {
-    ClearInputLine(CONSOLE_WIDTH - 50, x, y);       // clear old message
-    SetRgbLine(COLOUR_RED_ON_BLACK, message, x, y); // show colored message
+    ClearInputLine(CONSOLE_WIDTH - 50, x, y);
+    SetRgbLine(COLOUR_RED_ON_BLACK, message, x, y);
 }
 // Print colored text (no positioning)
 static void SetRgbLine(EColour colour, const string& text)

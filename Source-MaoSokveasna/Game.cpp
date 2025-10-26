@@ -1,17 +1,13 @@
 #include "Game.h"
 
-// === Constructor / Destructor ===
 Game::Game() : debugMode(false) {
     human = new Player("Player", false);
     computer = new Player("Computer", true);
 }
-
 Game::~Game() {
     delete human;
     delete computer;
 }
-
-// === MAIN LOOP ===
 void Game::Run() {
     bool running = true;
     while (running) {
@@ -36,7 +32,9 @@ void Game::Run() {
     }
 
     ClearScreen();
-    SetRgbLine(COLOUR_CYAN_ON_BLACK, "Thank you for playing Battleships! See you next time.", 5, CONSOLE_WIDTH / 4);
+	DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
+    CenterTextColored("Thank you for playing Battleships! See you next time. :((", 13, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
+    system("pause > nul");
 }
 
 void Game::ShowMainMenu() const {
@@ -44,8 +42,7 @@ void Game::ShowMainMenu() const {
     ClearScreen();
     DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
 
-    // Title
-    CenterTextColored("=== BATTLESHIPS ===", 2, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
+    CenterTextColored("======= BATTLESHIPS =======", 2, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
 
     // Menu options
     CenterText("1. Start New Game", 5, CONSOLE_WIDTH);
