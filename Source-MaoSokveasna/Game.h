@@ -2,11 +2,11 @@
 #include "Player.h"
 #include "Utility.h"
 
-class Game {
+class CGame {
 private:
-    Player* human;
-    Player* computer;
-    bool debugMode;
+	CPlayer* pHuman; // Pointer to the human player
+	CPlayer* pComputer; // Pointer to the computer player
+	bool bDebugMode; // Debug mode flag
 
     void ShowMainMenu() const;
     void ShowShipPlacementMenu() const;
@@ -14,8 +14,7 @@ private:
     void ToggleDebugMode();
     void ShowGameOver();
 public:
-    Game(); // TF: Constructor
-    ~Game(); // TF: Destructor
-
+    CGame(); // TF: Constructor
+    ~CGame(); // TF: Destructor
     void Run();
 };

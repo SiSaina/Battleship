@@ -29,33 +29,32 @@ enum EColour
 	COLOUR_WHITE_ON_WHITE = 15 // White on White.
 };
 
-int GetValidMainMenuChoice(int startX, int startY);
-int GetValidPlacementMenuChoice(int startX, int startY);
-string GetValidCoordinateInput(int startX, int startY);
-char GetValidOrientationInput(int startX, int startY);
-char GetValidDirectionInput(char orientation, int startX, int startY);
+// Input functions
+int GetValidMainMenuChoice(int iStartX, int iStartY);
+int GetValidPlacementMenuChoice(int iStartX, int iStartY);
+string GetValidCoordinateInput(int iStartX, int iStartY);
+char GetValidOrientationInput(int iStartX, int iStartY);
+char GetValidDirectionInput(char chOrientation, int iStartX, int iStartY);
 
-bool ParseCoordinate(const string& input, int& row, int& col); // TF: Function
-bool IsCoordinatorInputValid(const string& input); // TF: Function
-bool IsShipOutOfBound(int row, int col, int shipSize, bool horizontal); // TF: Function
-bool IsOrientationInputValid(char orientation); // TF: Function
-bool IsDirectionInputValid(char direction); // TF: Function
-void DrawBorder(int CONSOLE_WIDTH, int CONSOLE_HEIGHT);
+// Validation functions
+bool ParseCoordinate(const string& strInput, int& iRow, int& iCol);
+bool IsCoordinatorInputValid(const string& strInput);
+bool IsShipOutOfBound(int iRow, int iCol, int iShipSize, bool bHorizontal);
+bool IsOrientationInputValid(char chOrientation);
+bool IsDirectionInputValid(char chDirection);
+
+
+// Display / console functions
+void DrawBorder();
 void ClearScreen();
-void GotoXY(int x, int y);
-// Clear a single line of input
-void ClearInputLine(int CONSOLE_WIDTH, int START_X, int START_Y);
-// Clear multiple lines of input area
-void ClearInputArea(int CONSOLE_WIDTH, int startX, int startY, int lines);
-// Center text horizontally in the console
-void CenterText(const string& text, int row, int totalWidth);
-// Center colored text horizontally in the console
-void CenterTextColored(const string& text, int row, int totalWidth, EColour color);
-// Show input error message in red at specified position
-static void ShowInputError(const string& message, int x, int y);
-// Print colored text (no positioning)
-static void SetRgbLine(EColour colour, const string& text);
-// Print colored text at a specific console position
-void SetRgbLine(EColour colour, const string& text, int x, int y);
-// Set console text color based on EColour enum
-void SetRgb(EColour colour);
+void GotoXY(int iX, int iY);
+void ClearInputLine(int iConsoleWidth, int iStartX, int iStartY);
+void ClearInputArea(int iConsoleWidth, int iStartX, int iStartY, int iLines);
+void CenterText(const string& strText, int iRow, int iTotalWidth);
+void CenterTextColored(const string& strText, int iRow, int iTotalWidth, EColour eColour);
+
+// Colored text helpers
+static void ShowInputError(const string& strMessage, int iX, int iY);
+static void SetRgbLine(EColour eColour, const string& strText);
+void SetRgbLine(EColour eColour, const string& strText, int iX, int iY);
+void SetRgb(EColour eColour);

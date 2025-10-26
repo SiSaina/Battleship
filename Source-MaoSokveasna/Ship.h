@@ -10,17 +10,16 @@
 
 using namespace std;
 
-class Ship
+class CShip
 {
 private:
-    string name;
-    int size;
-    int hits;
+    string strName;
+    int iSize;
+    int iHits;
 public:
     // TF: Class
-    Ship(string name, int size); // TF: Constructor
-    Ship(const Ship& other); // TF: Copy Constructor
-    ~Ship(); // TF: Destructor
+    CShip(string _strName, int _iSize); // TF: Constructor
+    CShip(const CShip& shipOther); // TF: Copy Constructor
 
     string GetName() const; // TF: Access Specifier
     int GetSize() const;

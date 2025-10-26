@@ -5,32 +5,33 @@
 const int GRID_SIZE = 10; // TF: Constant
 
 enum CellState {
-    EMPTY,
-    SHIP,
-    HIT,
-    MISS
+    CS_EMPTY,
+    CS_SHIP,
+    CS_HIT,
+    CS_MISS
 };
 
-struct Cell {
-    CellState state; // TF: Variable Type
-    Ship* ship;      // TF: Pointer Initialised
+struct CCell {
+    CellState eState; // TF: Variable Type
+    CShip* pShip;      // TF: Pointer Initialised
 };
 
-class Grid {
+class CGrid {
 private:
-    Cell cells[GRID_SIZE][GRID_SIZE]; // TF: Array
-    vector<Ship*> ships;
+    CCell arrCells[GRID_SIZE][GRID_SIZE]; // TF: Array
+    vector<CShip*> vecpShips;
 
-    bool IsValidPlacement(Ship* ship, int row, int col, bool horizontal) const;
+    bool IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal) const;
 public:
-    Grid(); // TF: Constructor
-    Grid(const Grid& other); // TF: Copy Constructor
-    ~Grid(); // TF: Destructor
+    CGrid(); // TF: Constructor
+    CGrid(const CGrid& gridOther); // TF: Copy Constructor
+    ~CGrid(); // TF: Destructor
 
-    bool PlaceShip(Ship* ship, int row, int col, bool horizontal);
-    bool FireAt(int row, int col, bool& hit, bool& sunk, string& shipName);
-    void Display(bool showShips, int startX, int startY) const;
+    // TF: Member Functions
+    void MarkTrackingCell(int iRow, int iCol, bool bHit);
+    void Display(bool bShowShips, int iStartX, int iStartY) const;
+    bool PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal);
+    bool FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipName);
     bool IsAllShipsSunk() const;
-    void MarkTrackingCell(int row, int col, bool hit); // TF: Function
-    bool IsCellUntouched(int row, int col) const;
+    bool IsCellUntouched(int iRow, int iCol) const;
 };  

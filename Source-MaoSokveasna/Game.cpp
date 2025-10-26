@@ -1,122 +1,109 @@
 #include "Game.h"
 
-Game::Game() : debugMode(false) {
-    human = new Player("Player", false);
-    computer = new Player("Computer", true);
+CGame::CGame() : bDebugMode(false) {
+    pHuman = new CPlayer("Player", false);
+    pComputer = new CPlayer("Computer", true);
 }
-Game::~Game() {
-    delete human;
-    delete computer;
+CGame::~CGame() {
+    delete pHuman;
+    delete pComputer;
 }
-void Game::Run() {
-    bool running = true;
-    while (running) {
+void CGame::Run() {
+    bool bRunning = true;
+    while (bRunning) {
         ClearScreen();
         ShowMainMenu();
-        int choice = GetValidMainMenuChoice((CONSOLE_WIDTH - 72), 11);
-
-        switch (choice) {
-        case 1:
-            StartNewGame();
-            break;
-        case 2:
-            ToggleDebugMode();
-            break;
-        case 3:
-            running = false;
-            break;
+		// Get main menu choice at specified position
+        int iChoice = GetValidMainMenuChoice((CONSOLE_WIDTH - 72), 11);
+        switch (iChoice) {
+        case 1: StartNewGame(); break;
+        case 2: ToggleDebugMode(); break;
+        case 3: bRunning = false; break;
         default:
             SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid option. Try again.", (CONSOLE_WIDTH - 72), 13);
             break;
         }
     }
-
     ClearScreen();
-	DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
+	DrawBorder();
     CenterTextColored("Thank you for playing Battleships! See you next time. :((", 13, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
     system("pause > nul");
 }
-
-void Game::ShowMainMenu() const {
-
+void CGame::ShowMainMenu() const {
     ClearScreen();
-    DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
-
+    DrawBorder();
     CenterTextColored("======= BATTLESHIPS =======", 2, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
-
-    // Menu options
     CenterText("1. Start New Game", 5, CONSOLE_WIDTH);
-    CenterText("2. Toggle Debug Mode (" + string(debugMode ? "ON" : "OFF") + ")", 6, CONSOLE_WIDTH);
+    CenterText("2. Toggle Debug Mode (" + string(bDebugMode ? "ON" : "OFF") + ")", 6, CONSOLE_WIDTH);
     CenterText("3. Exit", 7, CONSOLE_WIDTH);
-
-    // Divider
-    SetRgb(COLOUR_BLUE_ON_BLACK);
-    CenterText("---------------------------------", 9, CONSOLE_WIDTH);
-    SetRgb(COLOUR_WHITE_ON_BLACK);
-
+	CenterTextColored("---------------------------------", 9, CONSOLE_WIDTH, COLOUR_BLUE_ON_BLACK);
 }
-void Game::ShowShipPlacementMenu() const {
+void CGame::ShowShipPlacementMenu() const {
     ClearScreen();
-    DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
+    DrawBorder();
+
     CenterTextColored("Choose Ship Placement Method", 2, CONSOLE_WIDTH, COLOUR_YELLOW_ON_BLACK);
     CenterText("1. Manual Placement", 4, CONSOLE_WIDTH);
     CenterText("2. Random Placement", 5, CONSOLE_WIDTH);
 }
-
-// === TOGGLE DEBUG ===
-void Game::ToggleDebugMode() {
-    debugMode = !debugMode;
-    SetRgb(debugMode ? COLOUR_GREEN_ON_BLACK : COLOUR_RED_ON_BLACK);
-    cout << "Debug mode is now " << (debugMode ? "ON" : "OFF") << ".\n";
-    SetRgb(COLOUR_WHITE_ON_BLACK);
+// Toggle debug mode on/off
+void CGame::ToggleDebugMode() {
+    bDebugMode = !bDebugMode;
 }
-
-// === GAME START ===
-void Game::StartNewGame() {
+// Start a new game
+void CGame::StartNewGame() {
     ClearScreen();
-
-    delete human;
-    delete computer;
-    human = new Player("Player", false);
-    computer = new Player("Computer", true);
+	// Delete previous objects and create a new one
+    delete pHuman;
+    delete pComputer;
+    pHuman = new CPlayer("Player", false);
+    pComputer = new CPlayer("Computer", true);
 
     ShowShipPlacementMenu();
-    int setupChoice = GetValidPlacementMenuChoice((CONSOLE_WIDTH - 72), 9);
-    bool manual = (setupChoice == 1);
+    int iSetupChoice = GetValidPlacementMenuChoice((CONSOLE_WIDTH - 72), 9);
+    bool bManual = (iSetupChoice == 1);
 
+    // Clear the ship placement input area
     ClearInputArea(CONSOLE_WIDTH - 2, 10, 1, 15);
 
-    human->SetupShips(manual);
-    computer->SetupShips(false);
+	// Setup ships for both players
+    pHuman->SetupShips(bManual);
+    pComputer->SetupShips(false);
+    
     ClearScreen();
+    bool isGameOver = false;
 
-    bool gameOver = false;
-    while (!gameOver) {
-        DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
-        human->ShowGrids(debugMode, 30, 5);
+    while (!isGameOver) {
+        DrawBorder();
 
-        cout << "\n";
-        computer->ShowGrids(debugMode, 50, 5);
-        // Player's turn
+        pHuman->ShowGrids(bDebugMode, 30, 5);         // Display ppHuman grids
+		pComputer->ShowGrids(bDebugMode, 50, 5);      // Display ppComputer grids
 
-        gameOver = human->TakeTurn(*computer, 32, 18);
-        if (gameOver) break;
+		// Player's turn
+        isGameOver = pHuman->TakeTurn(*pComputer, 32, 18);
+        if (isGameOver) break;
 
-        // Computer's turn
-        computer->TakeTurn(*human, 32, 20);
-        gameOver = human->HasLost();
+        // ppComputer's turn
+        pComputer->TakeTurn(*pHuman, 32, 20);
+        isGameOver = pHuman->HasLost();
     }
 
     ClearScreen();
     ShowGameOver();
 }
 
-void Game::ShowGameOver() {
+void CGame::ShowGameOver() {
     ClearScreen();
-    DrawBorder(CONSOLE_WIDTH, CONSOLE_HEIGHT);
-    CenterTextColored("=== GAME OVER ===", 2, CONSOLE_WIDTH, COLOUR_YELLOW_ON_BLACK);
-    if (human->HasLost()) CenterTextColored("Defeat! The computer sunk your fleet.", 5, CONSOLE_WIDTH, COLOUR_RED_ON_BLACK);
-    else CenterTextColored("Victory! You destroyed all enemy ships!", 5, CONSOLE_WIDTH, COLOUR_GREEN_ON_BLACK);
-	CenterTextColored("Press any key to return to menu...", 9, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
+    DrawBorder();
+    
+    CenterTextColored("========= GAME OVER =========", 2, CONSOLE_WIDTH, COLOUR_YELLOW_ON_BLACK);
+	// Display victory or defeat message
+    if (pHuman->HasLost()) {
+        CenterTextColored("Defeat! The Computer sunk your fleet.", 5, CONSOLE_WIDTH, COLOUR_RED_ON_BLACK);
+    }
+    else {
+        CenterTextColored("Victory! You destroyed all enemy ships!", 5, CONSOLE_WIDTH, COLOUR_GREEN_ON_BLACK);
+    }
+    CenterTextColored("Press any key to return to menu...", 9, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
     system("pause > nul");
 }

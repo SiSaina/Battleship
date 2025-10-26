@@ -1,132 +1,154 @@
 #include "Grid.h"
 
-Grid::Grid() { // TF: Constructor
-    for (int i = 0; i < GRID_SIZE; ++i) { // TF: Iteration Structure
-        for (int j = 0; j < GRID_SIZE; ++j) {
-            cells[i][j].state = EMPTY;
-            cells[i][j].ship = nullptr;
+CGrid::CGrid() {
+    // Initialize all cells to empty and no ship
+    for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
+        for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
+            arrCells[iRow][iCol].eState = CS_EMPTY;
+            arrCells[iRow][iCol].pShip = nullptr;
         }
     }
 }
-Grid::Grid(const Grid& other) { // TF: Copy Constructor
-    for (Ship* ship : other.ships) {
-        ships.push_back(new Ship(*ship)); // TF: Dynamic Memory
+// Copy constructor
+CGrid::CGrid(const CGrid& gridOther) {
+    // Deep copy ships
+    for (CShip* pShip : gridOther.vecpShips) {
+        vecpShips.push_back(new CShip(*pShip));
     }
-    for (int i = 0; i < GRID_SIZE; ++i) { // TF: Iteration Structure
-        for (int j = 0; j < GRID_SIZE; ++j) {
-            cells[i][j].state = other.cells[i][j].state;
-            cells[i][j].ship = other.cells[i][j].ship;
 
-            //Relink ship pointers to the copied ships
-            Ship* original = other.cells[i][j].ship;
-            if (original) {
-                for (Ship* copy : ships) {
-                    if (copy->GetName() == original->GetName() && copy->GetSize() == original->GetSize()) {
-                        cells[i][j].ship = copy;
+    // Copy cell states and relink ship pointers
+    for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
+        for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
+            arrCells[iRow][iCol].eState = gridOther.arrCells[iRow][iCol].eState;
+            arrCells[iRow][iCol].pShip = nullptr;
+
+            CShip* pOriginalShip = gridOther.arrCells[iRow][iCol].pShip;
+            if (pOriginalShip) {
+                for (CShip* pCopyShip : vecpShips) {
+                    if (pCopyShip->GetName() == pOriginalShip->GetName() &&
+                        pCopyShip->GetSize() == pOriginalShip->GetSize()) {
+                        arrCells[iRow][iCol].pShip = pCopyShip;
                         break;
                     }
                 }
             }
-
         }
     }
 }
-Grid::~Grid() { // TF: Destructor
-    for (Ship* ship : ships) {
-        delete ship; // TF: Dynamic Memory
+
+CGrid::~CGrid() {
+    for (CShip* pShip : vecpShips) {
+        delete pShip;
     }
 }
-//Check the ship if it can be placed at the given position
-bool Grid::IsValidPlacement(Ship* ship, int row, int col, bool horizontal) const {
-    int length = ship->GetSize();
-    if (horizontal) {
-        if (col + length > GRID_SIZE) return false; // TF: Relational Operator
-        for (int i = 0; i < length; ++i) {
-            if (cells[row][col + i].state != EMPTY) return false;
+
+// Check if a ship can be placed at a given position
+bool CGrid::IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal) const {
+    int iLength = pShip->GetSize();
+    if (bHorizontal) {
+        if (iCol + iLength > GRID_SIZE) return false;
+        for (int i = 0; i < iLength; ++i) {
+            if (arrCells[iRow][iCol + i].eState != CS_EMPTY) return false;
         }
     }
     else {
-        if (row + length > GRID_SIZE) return false;
-        for (int i = 0; i < length; ++i) {
-            if (cells[row + i][col].state != EMPTY) return false;
+        if (iRow + iLength > GRID_SIZE) return false;
+        for (int i = 0; i < iLength; ++i) {
+            if (arrCells[iRow + i][iCol].eState != CS_EMPTY) return false;
         }
     }
     return true;
 }
 
-bool Grid::PlaceShip(Ship* ship, int row, int col, bool horizontal) {
-    if (!IsValidPlacement(ship, row, col, horizontal)) return false;
+// Place ship at a valid position
+bool CGrid::PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal) {
+    if (!IsValidPlacement(pShip, iRow, iCol, bHorizontal)) return false;
 
-    int length = ship->GetSize();
-    for (int i = 0; i < length; ++i) {
-        int r = row + (horizontal ? 0 : i);
-        int c = col + (horizontal ? i : 0);
-        cells[r][c].state = SHIP;
-        cells[r][c].ship = ship; // TF: Pointer Dereferenced
+    int iLength = pShip->GetSize();
+    for (int i = 0; i < iLength; ++i) {
+        int r = iRow + (bHorizontal ? 0 : i);
+        int c = iCol + (bHorizontal ? i : 0);
+        arrCells[r][c].eState = CS_SHIP;
+        arrCells[r][c].pShip = pShip;
     }
 
-    ships.push_back(ship); // TF: Array
+    vecpShips.push_back(pShip);
     return true;
 }
 
-// Fire at the specified cell and update its state
-bool Grid::FireAt(int row, int col, bool& hit, bool& sunk, string& shipName) {
-    Cell& cell = cells[row][col];
-    if (cell.state == HIT || cell.state == MISS) return false;
+// Fire at a cell, return hit/sunk status
+bool CGrid::FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipName) {
+    CCell& cell = arrCells[iRow][iCol];
 
-    if (cell.state == SHIP) {
-        cell.state = HIT;
-        cell.ship->RegisterHit();
-        hit = true;
-        sunk = cell.ship->IsSunk();
-        shipName = cell.ship->GetName();
+    if (cell.eState == CS_HIT || cell.eState == CS_MISS) return false;
+
+    if (cell.eState == CS_SHIP) {
+        cell.eState = CS_HIT;
+        cell.pShip->RegisterHit();
+        bHit = true;
+        bSunk = cell.pShip->IsSunk();
+        strShipName = cell.pShip->GetName();
     }
     else {
-        cell.state = MISS;
-        hit = false;
-        sunk = false;
+        cell.eState = CS_MISS;
+        bHit = false;
+        bSunk = false;
     }
+
     return true;
 }
 
-// Display the grid
-void Grid::Display(bool showShips, int startX, int startY) const {
-    GotoXY(startX, startY);
+// Display grid on console
+void CGrid::Display(bool bShowShips, int nStartX, int nStartY) const {
+    GotoXY(nStartX, nStartY);
     cout << "  ";
     for (int i = 0; i < GRID_SIZE; ++i) cout << setw(2) << char('A' + i);
-    cout << "\n";
 
-    for (int row = 0; row < GRID_SIZE; ++row) {
-        GotoXY(startX, startY + row + 1);
-        cout << setw(2) << row + 1;
-        for (int col = 0; col < GRID_SIZE; ++col) {
-            char symbol = '.';
-            const Cell& cell = cells[row][col];
-            if (cell.state == HIT) { SetRgb(COLOUR_RED_ON_BLACK); symbol = 'X'; }
-            else if (cell.state == MISS) { SetRgb(COLOUR_GREEN_ON_BLACK); symbol = 'o'; }
-            else if (cell.state == SHIP && showShips) { SetRgb(COLOUR_YELLOW_ON_BLACK); symbol = 'S'; }
-            else SetRgb(COLOUR_WHITE_ON_BLACK);
+    for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
+        GotoXY(nStartX, nStartY + iRow + 1);
+        cout << setw(2) << iRow + 1;
 
-            cout << setw(2) << symbol;
+        for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
+            char cSymbol = '.';
+            const CCell& cell = arrCells[iRow][iCol];
+
+            if (cell.eState == CS_HIT) {
+                SetRgb(COLOUR_RED_ON_BLACK); 
+                cSymbol = 'X'; 
+            }
+            else if (cell.eState == CS_MISS) { 
+                SetRgb(COLOUR_GREEN_ON_BLACK); 
+                cSymbol = 'o'; 
+            }
+            else if (cell.eState == CS_SHIP && bShowShips) { 
+                SetRgb(COLOUR_YELLOW_ON_BLACK); 
+                cSymbol = 'S'; 
+            }
+            else {
+                SetRgb(COLOUR_WHITE_ON_BLACK);
+            }
+
+            cout << setw(2) << cSymbol;
             SetRgb(COLOUR_WHITE_ON_BLACK);
         }
-        cout << "\n";
     }
 }
 
-bool Grid::IsAllShipsSunk() const {
-    for (Ship* ship : ships) {
-        if (!ship->IsSunk()) return false;
+// Check if all ships are sunk
+bool CGrid::IsAllShipsSunk() const {
+    for (CShip* pShip : vecpShips) {
+        if (!pShip->IsSunk()) return false;
     }
     return true;
 }
 
-// Mark the tracking grid cell as hit or miss
-void Grid::MarkTrackingCell(int row, int col, bool hit) {
-    cells[row][col].state = hit ? HIT : MISS; // TF: Conditional Statement
+// Mark tracking cell as hit or miss
+void CGrid::MarkTrackingCell(int iRow, int iCol, bool bHit) {
+    arrCells[iRow][iCol].eState = bHit ? CS_HIT : CS_MISS;
 }
 
-bool Grid::IsCellUntouched(int row, int col) const {
-    CellState state = cells[row][col].state;
-    return state != HIT && state != MISS;
+// Check if cell has not been fired at yet
+bool CGrid::IsCellUntouched(int iRow, int iCol) const {
+    CellState eState = arrCells[iRow][iCol].eState;
+    return eState != CS_HIT && eState != CS_MISS;
 }

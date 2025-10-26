@@ -1,62 +1,64 @@
 #include "AI.h"
 
-AI::AI() : huntMode(true) { // TF: Constructor
-    srand(static_cast<unsigned>(time(nullptr))); // TF: Pseudo Random Number
+AI::AI() : bHuntMode(true) {
+	srand(static_cast<unsigned>(time(nullptr))); // TF: Pseudo Random Number
     InitializeTargets();
 }
 
-AI::~AI() {} // TF: Destructor
-
+// Initialize all possible targets (0-9 rows, 0-9 cols) and shuffle them
 void AI::InitializeTargets() {
-    for (int row = 0; row < 10; ++row) {
-        for (int col = 0; col < 10; ++col) {
-            availableTargets.push_back({ row, col });
+    for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
+        for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
+            vecAvailableTargets.push_back({ iRow, iCol });
         }
     }
-    random_shuffle(availableTargets.begin(), availableTargets.end());
+    random_shuffle(vecAvailableTargets.begin(), vecAvailableTargets.end());
 }
 
-bool AI::IsValidCoord(int row, int col) {
-    return row >= 0 && row < 10 && col >= 0 && col < 10;
+// Check if coordinate is within the grid bounds
+bool AI::IsValidCoordinate(int iRow, int iCol) const {
+    return iRow >= 0 && iRow < GRID_SIZE && iCol >= 0 && iCol < GRID_SIZE;
 }
 
-void AI::AddAdjacentTargets(int row, int col) {
-    vector<pair<int, int>> directions = {
-        { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 }
-    };
+// Add adjacent cells to the queue to target after a hit
+void AI::AddAdjacentTargets(int iRow, int iCol) {
+    vector<pair<int, int>> vecDirections = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
 
-    for (auto& dir : directions) {
-        int newRow = row + dir.first;
-        int newCol = col + dir.second;
-        if (IsValidCoord(newRow, newCol)) {
-            targetQueue.push_back({ newRow, newCol });
+    for (auto& dir : vecDirections) {
+        int iNewRow = iRow + dir.first;
+        int iNewCol = iCol + dir.second;
+        if (IsValidCoordinate(iNewRow, iNewCol)) {
+            vecTargetQueue.push_back({ iNewRow, iNewCol });
         }
     }
 }
 
-pair<int, int> AI::GetNextTarget(bool lastHit, int lastRow, int lastCol, const Grid& trackingGrid) {
-    if (lastHit) {
-        huntMode = false;
-        AddAdjacentTargets(lastRow, lastCol);
+// Determine next target based on last hit info and tracking grid
+pair<int, int> AI::GetNextTarget(bool bLastHit, int iLastRow, int iLastCol, const CGrid& gridTracking) {
+    if (bLastHit) {
+        bHuntMode = false;
+        AddAdjacentTargets(iLastRow, iLastCol); // Queue adjacent targets
     }
 
-    while (!targetQueue.empty()) {
-        pair<int, int> target = targetQueue.back();
-        targetQueue.pop_back();
-        if (trackingGrid.IsCellUntouched(target.first, target.second)) {
-            return target;
+    // Check target queue first (targets around a hit)
+    while (!vecTargetQueue.empty()) {
+        pair<int, int> prTarget = vecTargetQueue.back();
+        vecTargetQueue.pop_back();
+        if (gridTracking.IsCellUntouched(prTarget.first, prTarget.second)) {
+            return prTarget;
         }
     }
 
-    huntMode = true;
-    while (!availableTargets.empty()) {
-        pair<int, int> target = availableTargets.back();
-        availableTargets.pop_back();
-        if (trackingGrid.IsCellUntouched(target.first, target.second)) {
-            return target;
+    // If no queued targets, return to hunting mode
+    bHuntMode = true;
+    while (!vecAvailableTargets.empty()) {
+        pair<int, int> prTarget = vecAvailableTargets.back();
+        vecAvailableTargets.pop_back();
+        if (gridTracking.IsCellUntouched(prTarget.first, prTarget.second)) {
+            return prTarget;
         }
     }
 
-
-    return { -1,-1 };
+    // If all else fails (should not happen), return invalid
+    return { -1, -1 };
 }
