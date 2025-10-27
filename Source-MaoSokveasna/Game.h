@@ -2,13 +2,13 @@
 #include "Player.h"
 #include "Utility.h"
 
-class CGame {
-private:
-	CPlayer* pHuman; // Pointer to the human player
-	CPlayer* pComputer; // Pointer to the computer player
-	bool bDebugMode; // Debug mode flag
+class CGame { // TF: Class
+private: // TF: Access Specifier
+	CPlayer* pHuman; // TF: Pointer Initialised
+	CPlayer* pComputer;
+	bool bDebugMode; // TF: Variable Type
 
-    void ShowMainMenu() const;
+    void ShowMainMenu() const; // TF: Constant Member Function
     void ShowShipPlacementMenu() const;
     void StartNewGame();
     void ToggleDebugMode();

@@ -12,8 +12,8 @@ enum CellState {
 };
 
 struct CCell {
-    CellState eState; // TF: Variable Type
-    CShip* pShip;      // TF: Pointer Initialised
+    CellState eState;
+    CShip* pShip;
 };
 
 class CGrid {
@@ -21,17 +21,23 @@ private:
     CCell arrCells[GRID_SIZE][GRID_SIZE]; // TF: Array
     vector<CShip*> vecpShips;
 
+    // Check if a ship can be placed at a given position
     bool IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal) const;
 public:
-    CGrid(); // TF: Constructor
+    CGrid();
     CGrid(const CGrid& gridOther); // TF: Copy Constructor
-    ~CGrid(); // TF: Destructor
+    ~CGrid();
 
-    // TF: Member Functions
+    // Mark tracking cell as hit or miss
     void MarkTrackingCell(int iRow, int iCol, bool bHit);
+    // Display grid on console
     void Display(bool bShowShips, int iStartX, int iStartY) const;
+    // Place ship at a valid position
     bool PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal);
+    // Fire at a cell, return hit/sunk status
     bool FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipName);
+    // Check if all ships are sunk
     bool IsAllShipsSunk() const;
+    // Check if cell has not been fired at yet
     bool IsCellUntouched(int iRow, int iCol) const;
-};  
+};

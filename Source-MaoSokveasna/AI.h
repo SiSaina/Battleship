@@ -13,7 +13,7 @@ private:
     vector<pair<int, int>> vecTargetQueue;      // Targets to prioritize after a hit
     bool bHuntMode;                             // True if AI is hunting for new ships
 
-    // Initialize the list of all possible targets
+    // Initialize all possible targets (0-9 rows, 0-9 cols) and shuffle them
     void InitializeTargets();
     // Add adjacent cells to the target queue after a hit
     void AddAdjacentTargets(int iRow, int iCol);
@@ -21,9 +21,8 @@ private:
     bool IsValidCoordinate(int iRow, int iCol) const; // mark const
 
 public:
-    AI();  // Constructor
-    ~AI() {} // Destructor
-
-    // Get next firing target; uses last hit info and tracking grid
+    AI();
+    
+    // Determine next target based on last hit info and tracking grid
     pair<int, int> GetNextTarget(bool bLastHit, int iLastRow, int iLastCol, const CGrid& gridTracking);
 };

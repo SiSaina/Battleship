@@ -1,24 +1,28 @@
 #include "Game.h"
 
 CGame::CGame() : bDebugMode(false) {
-    pHuman = new CPlayer("Player", false);
-    pComputer = new CPlayer("Computer", true);
+	pHuman = new CPlayer("Player", false); // TF: Pointer Initialised, TF: Class Instance, // TF: Dynamic Memory
+	pComputer = new CPlayer("Computer", true); 
 }
 CGame::~CGame() {
-    delete pHuman;
+	delete pHuman; // TF: Dynamic Memory
     delete pComputer;
 }
 void CGame::Run() {
     bool bRunning = true;
+
+	// TF: Iteration Statement
     while (bRunning) {
         ClearScreen();
         ShowMainMenu();
 		// Get main menu choice at specified position
         int iChoice = GetValidMainMenuChoice((CONSOLE_WIDTH - 72), 11);
+
+		// TF: Conditional Statement
         switch (iChoice) {
         case 1: StartNewGame(); break;
         case 2: ToggleDebugMode(); break;
-        case 3: bRunning = false; break;
+		case 3: bRunning = false; break;
         default:
             SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid option. Try again.", (CONSOLE_WIDTH - 72), 13);
             break;
@@ -61,12 +65,10 @@ void CGame::StartNewGame() {
 
     ShowShipPlacementMenu();
     int iSetupChoice = GetValidPlacementMenuChoice((CONSOLE_WIDTH - 72), 9);
-    bool bManual = (iSetupChoice == 1);
+	bool bManual = (iSetupChoice == 1); // TF: Relational Operator
 
-    // Clear the ship placement input area
     ClearInputArea(CONSOLE_WIDTH - 2, 10, 1, 15);
 
-	// Setup ships for both players
     pHuman->SetupShips(bManual);
     pComputer->SetupShips(false);
     
@@ -76,14 +78,14 @@ void CGame::StartNewGame() {
     while (!isGameOver) {
         DrawBorder();
 
-        pHuman->ShowGrids(bDebugMode, 30, 5);         // Display ppHuman grids
-		pComputer->ShowGrids(bDebugMode, 50, 5);      // Display ppComputer grids
+        pHuman->ShowGrids(bDebugMode, 30, 5);
+		pComputer->ShowGrids(bDebugMode, 50, 5);
 
-		// Player's turn
+		// TF: Pointer Dereference
+		// TF: Reference
         isGameOver = pHuman->TakeTurn(*pComputer, 32, 18);
         if (isGameOver) break;
 
-        // ppComputer's turn
         pComputer->TakeTurn(*pHuman, 32, 20);
         isGameOver = pHuman->HasLost();
     }

@@ -1,5 +1,6 @@
 #include "Utility.h"
 
+// Input functions
 int GetValidMainMenuChoice(int iStartX, int iStartY) {
     int iChoice;
     while (true) {
@@ -17,7 +18,6 @@ int GetValidMainMenuChoice(int iStartX, int iStartY) {
     }
     return iChoice;
 }
-
 int GetValidPlacementMenuChoice(int iStartX, int iStartY) {
     int iChoice;
     while (true) {
@@ -35,7 +35,6 @@ int GetValidPlacementMenuChoice(int iStartX, int iStartY) {
     }
     return iChoice;
 }
-
 string GetValidCoordinateInput(int iStartX, int iStartY) {
     string strCoordinate;
     while (true) {
@@ -54,7 +53,6 @@ string GetValidCoordinateInput(int iStartX, int iStartY) {
     }
     return strCoordinate;
 }
-
 char GetValidOrientationInput(int iStartX, int iStartY) {
     string strInput;
     while (true) {
@@ -68,25 +66,22 @@ char GetValidOrientationInput(int iStartX, int iStartY) {
             continue;
         }
 
-        char chOrientation = toupper(strInput[0]);
-        if (!IsOrientationInputValid(chOrientation)) {
-            ShowInputError("Invalid orientation input. Try again.", iStartX, iStartY + 2);
+        char cOrientation = toupper(strInput[0]);
+        if (!IsOrientationInputValid(cOrientation)) {
+            ShowInputError("Invalid orientation input.", iStartX, iStartY + 2);
             ClearInputLine(CONSOLE_WIDTH - 50, iStartX, iStartY);
             continue;
         }
 
-        return chOrientation;
+        return cOrientation;
     }
 }
-
-char GetValidDirectionInput(char chOrientation, int iStartX, int iStartY) {
+char GetValidDirectionInput(char cOrientation, int iStartX, int iStartY) {
     string strInput;
     while (true) {
         GotoXY(iStartX, iStartY);
-        if (chOrientation == 'H')
-            cout << "Direction (L for left, R for right): ";
-        else
-            cout << "Direction (U for up, D for down): ";
+        if (cOrientation == 'H') cout << "Direction (L for left, R for right): ";
+        else cout << "Direction (U for up, D for down): ";
         cin >> strInput;
 
         if (strInput.length() != 1) {
@@ -95,63 +90,61 @@ char GetValidDirectionInput(char chOrientation, int iStartX, int iStartY) {
             continue;
         }
 
-        char chDirection = toupper(strInput[0]);
-        if (!IsDirectionInputValid(chDirection)) {
+        char cDirection = toupper(strInput[0]);
+        if (!IsDirectionInputValid(cDirection)) {
             ShowInputError("Invalid direction input. Try again.", iStartX, iStartY + 2);
             ClearInputLine(CONSOLE_WIDTH - 50, iStartX, iStartY);
             continue;
         }
 
-        if ((chOrientation == 'H' && (chDirection == 'U' || chDirection == 'D')) ||
-            (chOrientation == 'V' && (chDirection == 'L' || chDirection == 'R'))) {
+        if ((cOrientation == 'H' && (cDirection == 'U' || cDirection == 'D')) ||
+            (cOrientation == 'V' && (cDirection == 'L' || cDirection == 'R'))) {
             ShowInputError("Invalid direction for this orientation. Try again.", iStartX, iStartY + 2);
             ClearInputLine(CONSOLE_WIDTH - 50, iStartX, iStartY);
             continue;
         }
 
-        return chDirection;
+        return cDirection;
     }
 }
 
+// Validation functions
 bool ParseCoordinate(const string& strInput, int& iRow, int& iCol) {
     if (strInput.length() < 2) return false;
 
-    char chLetter = toupper(strInput[0]);
+    char cLetter = toupper(strInput[0]);
     string strNumberPart = strInput.substr(1);
 
-    if (chLetter < 'A' || chLetter > 'J') return false;
+    if (cLetter < 'A' || cLetter > 'J') return false;
     try {
         iRow = stoi(strNumberPart) - 1;
-        iCol = chLetter - 'A';
+        iCol = cLetter - 'A';
         return iRow >= 0 && iRow < 10 && iCol >= 0 && iCol < 10;
     }
     catch (...) {
         return false;
     }
 }
-
 bool IsCoordinatorInputValid(const string& strInput) {
     int iRow, iCol;
     return ParseCoordinate(strInput, iRow, iCol);
 }
-
 bool IsShipOutOfBound(int iRow, int iCol, int iShipSize, bool bHorizontal) {
     if (bHorizontal) return iCol >= 0 && iCol + iShipSize <= 10;
     else return iRow >= 0 && iRow + iShipSize <= 10;
 }
-
 bool IsOrientationInputValid(char chOrientation) {
     if (!isalpha(chOrientation)) return false;
     chOrientation = toupper(chOrientation);
     return (chOrientation == 'H' || chOrientation == 'V');
 }
-
-bool IsDirectionInputValid(char chDirection) {
-    if (!isalpha(chDirection)) return false;
-    chDirection = toupper(chDirection);
-    return (chDirection == 'L' || chDirection == 'R' || chDirection == 'U' || chDirection == 'D');
+bool IsDirectionInputValid(char cDirection) {
+    if (!isalpha(cDirection)) return false;
+    cDirection = toupper(cDirection);
+    return (cDirection == 'L' || cDirection == 'R' || cDirection == 'U' || cDirection == 'D');
 }
 
+// Display / console functions
 void DrawBorder() {
     SetRgb(COLOUR_BLUE_ON_BLACK);
     GotoXY(0, 0);
@@ -170,24 +163,20 @@ void DrawBorder() {
     cout << char(188);
     SetRgb(COLOUR_WHITE_ON_BLACK);
 }
-
 void ClearScreen() {
     system("cls");
 }
-
 void GotoXY(int iX, int iY) {
     COORD coord{};
     coord.X = iX;
     coord.Y = iY;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
-
 void ClearInputLine(int iConsoleWidth, int iStartX, int iStartY) {
     GotoXY(iStartX, iStartY);
     cout << string(iConsoleWidth - 2, ' ');
     GotoXY(iStartX, iStartY);
 }
-
 void ClearInputArea(int iConsoleWidth, int iStartX, int iStartY, int iLines) {
     for (int i = 0; i < iLines; ++i) {
         GotoXY(iStartX, iStartY + i);
@@ -195,13 +184,11 @@ void ClearInputArea(int iConsoleWidth, int iStartX, int iStartY, int iLines) {
     }
     GotoXY(iStartX, iStartY);
 }
-
 void CenterText(const string& strText, int iRow, int iTotalWidth) {
     int iStartX = (iTotalWidth - static_cast<int>(strText.size())) / 2;
     GotoXY(iStartX, iRow);
     cout << strText;
 }
-
 void CenterTextColored(const string& strText, int iRow, int iTotalWidth, EColour eColour) {
     SetRgb(eColour);
     int iStartX = (iTotalWidth - static_cast<int>(strText.size())) / 2;
@@ -210,24 +197,22 @@ void CenterTextColored(const string& strText, int iRow, int iTotalWidth, EColour
     SetRgb(COLOUR_WHITE_ON_BLACK);
 }
 
+// Colored text helpers
 static void ShowInputError(const string& strMessage, int iX, int iY) {
     ClearInputLine(CONSOLE_WIDTH - 50, iX, iY);
     SetRgbLine(COLOUR_RED_ON_BLACK, strMessage, iX, iY);
 }
-
 static void SetRgbLine(EColour eColour, const string& strText) {
     SetRgb(eColour);
     cout << strText;
     SetRgb(COLOUR_WHITE_ON_BLACK);
 }
-
 void SetRgbLine(EColour eColour, const string& strText, int iX, int iY) {
     GotoXY(iX, iY);
     SetRgb(eColour);
     cout << strText;
     SetRgb(COLOUR_WHITE_ON_BLACK);
 }
-// Set console text color based on EColour enum
 void SetRgb(EColour colour)
 {
     switch (colour)

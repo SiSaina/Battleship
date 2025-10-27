@@ -30,17 +30,27 @@ enum EColour
 };
 
 // Input functions
+// Get validated menu choices and inputs
 int GetValidMainMenuChoice(int iStartX, int iStartY);
+// Get validated placement menu choice
 int GetValidPlacementMenuChoice(int iStartX, int iStartY);
+// Get validated coordinate input
 string GetValidCoordinateInput(int iStartX, int iStartY);
+// Get validated orientation input
 char GetValidOrientationInput(int iStartX, int iStartY);
+// Get validated direction input
 char GetValidDirectionInput(char chOrientation, int iStartX, int iStartY);
 
 // Validation functions
+// Parse and validate coordinator inputs
 bool ParseCoordinate(const string& strInput, int& iRow, int& iCol);
+// Check validity of coordinate inputs
 bool IsCoordinatorInputValid(const string& strInput);
+// Check if ship placement is out of bounds
 bool IsShipOutOfBound(int iRow, int iCol, int iShipSize, bool bHorizontal);
+// Check validity of orientation input
 bool IsOrientationInputValid(char chOrientation);
+// Check validity of direction input
 bool IsDirectionInputValid(char chDirection);
 
 
@@ -48,13 +58,20 @@ bool IsDirectionInputValid(char chDirection);
 void DrawBorder();
 void ClearScreen();
 void GotoXY(int iX, int iY);
+// Clear specific input line
 void ClearInputLine(int iConsoleWidth, int iStartX, int iStartY);
+// Clear specific input area (multiple lines)
 void ClearInputArea(int iConsoleWidth, int iStartX, int iStartY, int iLines);
+// Center text helpers
 void CenterText(const string& strText, int iRow, int iTotalWidth);
+// Center colored text helpers
 void CenterTextColored(const string& strText, int iRow, int iTotalWidth, EColour eColour);
 
 // Colored text helpers
+// Show input error message at specific position
 static void ShowInputError(const string& strMessage, int iX, int iY);
+// Set colored text in current position
 static void SetRgbLine(EColour eColour, const string& strText);
+// Set colored text at specific position
 void SetRgbLine(EColour eColour, const string& strText, int iX, int iY);
 void SetRgb(EColour eColour);

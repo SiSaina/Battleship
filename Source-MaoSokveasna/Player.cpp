@@ -4,18 +4,14 @@
 CPlayer::CPlayer() : strName("Player"), isComputer(false) {
     srand(static_cast<unsigned>(time(nullptr))); // TF: Pesudo Random Number
 }
-CPlayer::CPlayer(string _strName, bool _bIsComputer)
-    : strName(_strName), isComputer(_bIsComputer) {
+CPlayer::CPlayer(string _strName, bool _isComputer) : strName(_strName), isComputer(_isComputer) {
 	srand(static_cast<unsigned>(time(nullptr))); // TF: Pesudo Random Number
-}
-CPlayer::CPlayer(const CPlayer& other)
-    : strName(other.strName), isComputer(other.isComputer),
-    gridOwn(other.gridOwn), gridTracking(other.gridTracking) {
 }
 
 string CPlayer::GetName() const { return strName; }
 
 void CPlayer::SetupShips(bool bManual) {
+	// TF: Logical Operator
     if (bManual && !isComputer) ManualShipPlacement();
     else RandomShipPlacement();
 }
@@ -32,13 +28,12 @@ void CPlayer::ManualShipPlacement() {
         bool bPlaced = false;
 
         while (!bPlaced) {
-            // Display current grid
             SetRgbLine(COLOUR_WHITE_ON_BLACK, "Current Grid:", 20, 5);
             gridOwn.Display(true, 18, 6);
 
             GotoXY(kInputX, kInputY);
             cout << "Place " << SHIP_NAMES[iShip] << " (size " << SHIP_SIZES[iShip] << "): ";
-			// Get inputs from user (Coordinate, Orientation, Direction)
+			
             string strCoordinate = GetValidCoordinateInput(kInputX, kInputY + 2);
             char cOrientation = GetValidOrientationInput(kInputX, kInputY + 4);
             char cDirection = GetValidDirectionInput(cOrientation, kInputX, kInputY + 6);
@@ -87,14 +82,13 @@ void CPlayer::RandomShipPlacement() {
 
             CShip* pShip = new CShip(SHIP_NAMES[iShip], SHIP_SIZES[iShip]);
             bPlaced = gridOwn.PlaceShip(pShip, iRow, iCol, bHorizontal);
+
             if (!bPlaced) delete pShip;
         }
     }
 }
 
-// Take a turn against the opponent
 bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
-    string strCoordinate;
     int iRow = -1;
     int iCol = -1;
     bool bValid = false;
@@ -106,11 +100,13 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
 
     while (!bValid) {
         if (isComputer) {
+			// AI determines the next target
             pair<int, int> target = ai.GetNextTarget(bLastHit, iLastRow, iLastCol, gridTracking);
             iRow = target.first;
             iCol = target.second;
         }
         else {
+            string strCoordinate;
             GotoXY(iStartX, iStartY);
             cout << strName << ", enter target coordinate (e.g., B7): ";
             cin >> strCoordinate;
@@ -163,49 +159,38 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
     return opponent.HasLost();
 }
 
-// Check if all ships are sunk
 bool CPlayer::HasLost() const {
     return gridOwn.IsAllShipsSunk();
 }
 
-// Display grids (own and tracking) on screen
 void CPlayer::ShowGrids(bool bDebugMode, int iStartX, int iStartY) const {
     int iGridSpacing = GRID_SIZE * 2 + 6;
 
-	// In debug mode, show computer grid as well
+	// Lambda function to show a grid
+    auto ShowGrid = [&](const string& title, const CGrid& grid, bool bShowShips, int iOffset) {
+        GotoXY(iStartX + iOffset, iStartY);
+        cout << strName << "'s " << title << ":\n";
+        grid.Display(bShowShips, iStartX + iOffset - 1, iStartY + 1);
+    };
+
+    // In debug mode, show computer grid as well
     if (bDebugMode) {
+        // Player: Own Left, Tracking Right
         if (!isComputer) {
-			// Display own grid on the left, tracking grid on the right for player
-            GotoXY(iStartX - 22, iStartY);
-            cout << strName << "'s Own Grid:\n";
-            gridOwn.Display(true, iStartX - 23, iStartY + 1);
-
-            GotoXY(iStartX + iGridSpacing - 22, iStartY);
-            cout << strName << "'s Tracking Grid:\n";
-            gridTracking.Display(false, iStartX + iGridSpacing - 23, iStartY + 1);
-            return;
+            ShowGrid("Own Grid", gridOwn, true, -22);
+            ShowGrid("Tracking Grid", gridTracking, false, iGridSpacing - 22);
         }
+        // Computer: Tracking Left, Own Right
         else {
-			// Display tracking grid on the left, own grid on the right for computer
-            GotoXY(iStartX + 17, iStartY);
-            cout << strName << "'s Tracking Grid:\n";
-            gridTracking.Display(false, iStartX + 16, iStartY + 1);
-
-            GotoXY(iStartX + iGridSpacing + 17, iStartY);
-            cout << strName << "'s Own Grid:\n";
-            gridOwn.Display(true, iStartX + iGridSpacing + 16, iStartY + 1);
+            ShowGrid("Tracking Grid", gridTracking, false, 17);
+            ShowGrid("Own Grid", gridOwn, true, iGridSpacing + 17);
         }
     }
     else {
         if (!isComputer) {
-            // Display tracking grid on the left, own grid on the right for player
-            GotoXY(iStartX + 1, iStartY);
-            cout << strName << "'s Tracking Grid:\n";
-            gridTracking.Display(false, iStartX, iStartY + 1);
-
-            GotoXY(iStartX + iGridSpacing + 1, iStartY);
-            cout << strName << "'s Own Grid:\n";
-            gridOwn.Display(true, iStartX + iGridSpacing, iStartY + 1);
+            ShowGrid("Tracking Grid", gridTracking, false, 1);
+            ShowGrid("Own Grid", gridOwn, true, iGridSpacing + 1);
         }
+        // Computer in non-debug mode: show nothing
     }
 }

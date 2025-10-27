@@ -8,22 +8,26 @@ const int SHIP_SIZES[] = { 5, 4, 3, 3, 2 };
 
 class CPlayer {
 private:
-    string strName;          // Player name
-    bool isComputer;        // Flag for AI player
-    CGrid gridOwn;           // Player's own grid (ships)
-    CGrid gridTracking;      // Grid to track hits/misses on opponent
+	// TF: Variable Types
+    string strName;
+    bool isComputer;
+    CGrid gridOwn;
+    CGrid gridTracking;
 
     void ManualShipPlacement();
     void RandomShipPlacement();
 
 public:
-    CPlayer();                                     // Default constructor
-    CPlayer(string _strName, bool _bIsComputer);   // Param constructor with name and AI flag
-    CPlayer(const CPlayer& other);
+    CPlayer();
+	CPlayer(string _strName, bool _isComputer); // TF: Default Parameter Constructor
 
     string GetName() const;
     void SetupShips(bool bManual);
+
+	// Player takes a turn firing at opponent
     bool TakeTurn(CPlayer& opponent, int iStartX, int iStartY);
+    // Check if all ships are sunk
     bool HasLost() const;
+    // Display grids (own and tracking) on screen
     void ShowGrids(bool bDebugMode, int iStartX, int iStartY) const;
 };

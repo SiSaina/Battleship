@@ -11,7 +11,6 @@ CGrid::CGrid() {
 }
 // Copy constructor
 CGrid::CGrid(const CGrid& gridOther) {
-    // Deep copy ships
     for (CShip* pShip : gridOther.vecpShips) {
         vecpShips.push_back(new CShip(*pShip));
     }
@@ -38,14 +37,14 @@ CGrid::CGrid(const CGrid& gridOther) {
 
 CGrid::~CGrid() {
     for (CShip* pShip : vecpShips) {
-        delete pShip;
+		delete pShip; // TF: Pointer Dereference
     }
 }
 
-// Check if a ship can be placed at a given position
 bool CGrid::IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal) const {
     int iLength = pShip->GetSize();
     if (bHorizontal) {
+		// TF: Arithmetic Operator
         if (iCol + iLength > GRID_SIZE) return false;
         for (int i = 0; i < iLength; ++i) {
             if (arrCells[iRow][iCol + i].eState != CS_EMPTY) return false;
@@ -60,7 +59,6 @@ bool CGrid::IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal)
     return true;
 }
 
-// Place ship at a valid position
 bool CGrid::PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal) {
     if (!IsValidPlacement(pShip, iRow, iCol, bHorizontal)) return false;
 
@@ -76,15 +74,14 @@ bool CGrid::PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal) {
     return true;
 }
 
-// Fire at a cell, return hit/sunk status
 bool CGrid::FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipName) {
-    CCell& cell = arrCells[iRow][iCol];
+	CCell& cell = arrCells[iRow][iCol]; // TF: Reference
 
     if (cell.eState == CS_HIT || cell.eState == CS_MISS) return false;
 
     if (cell.eState == CS_SHIP) {
         cell.eState = CS_HIT;
-        cell.pShip->RegisterHit();
+		cell.pShip->RegisterHit(); // TF: Pointer Dereference
         bHit = true;
         bSunk = cell.pShip->IsSunk();
         strShipName = cell.pShip->GetName();
@@ -98,7 +95,6 @@ bool CGrid::FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipN
     return true;
 }
 
-// Display grid on console
 void CGrid::Display(bool bShowShips, int nStartX, int nStartY) const {
     GotoXY(nStartX, nStartY);
     cout << "  ";
@@ -134,7 +130,6 @@ void CGrid::Display(bool bShowShips, int nStartX, int nStartY) const {
     }
 }
 
-// Check if all ships are sunk
 bool CGrid::IsAllShipsSunk() const {
     for (CShip* pShip : vecpShips) {
         if (!pShip->IsSunk()) return false;
@@ -142,12 +137,10 @@ bool CGrid::IsAllShipsSunk() const {
     return true;
 }
 
-// Mark tracking cell as hit or miss
 void CGrid::MarkTrackingCell(int iRow, int iCol, bool bHit) {
     arrCells[iRow][iCol].eState = bHit ? CS_HIT : CS_MISS;
 }
 
-// Check if cell has not been fired at yet
 bool CGrid::IsCellUntouched(int iRow, int iCol) const {
     CellState eState = arrCells[iRow][iCol].eState;
     return eState != CS_HIT && eState != CS_MISS;
