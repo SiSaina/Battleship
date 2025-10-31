@@ -53,7 +53,6 @@ bool IsOrientationInputValid(char chOrientation);
 // Check validity of direction input
 bool IsDirectionInputValid(char chDirection);
 
-
 // Display / console functions
 void DrawBorder();
 void ClearScreen();

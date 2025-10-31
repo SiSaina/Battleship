@@ -173,7 +173,7 @@ void CPlayer::ShowGrids(bool bDebugMode, int iStartX, int iStartY) const {
         grid.Display(bShowShips, iStartX + iOffset - 1, iStartY + 1);
     };
 
-    // In debug mode, show computer grid as well
+    // In debug mode ON, show computer grid as well
     if (bDebugMode) {
         // Player: Own Left, Tracking Right
         if (!isComputer) {
@@ -191,6 +191,5 @@ void CPlayer::ShowGrids(bool bDebugMode, int iStartX, int iStartY) const {
             ShowGrid("Tracking Grid", gridTracking, false, 1);
             ShowGrid("Own Grid", gridOwn, true, iGridSpacing + 1);
         }
-        // Computer in non-debug mode: show nothing
     }
 }

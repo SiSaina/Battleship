@@ -28,9 +28,8 @@ public:
     CGrid(const CGrid& gridOther); // TF: Copy Constructor
     ~CGrid();
 
-    // Mark tracking cell as hit or miss
+    // Mark tracking cell, return hit or miss
     void MarkTrackingCell(int iRow, int iCol, bool bHit);
-    // Display grid on console
     void Display(bool bShowShips, int iStartX, int iStartY) const;
     // Place ship at a valid position
     bool PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal);
