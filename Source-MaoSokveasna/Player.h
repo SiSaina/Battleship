@@ -9,10 +9,10 @@ const int SHIP_SIZES[] = { 5, 4, 3, 3, 2 };
 class CPlayer {
 private:
 	// TF: Variable Types
-    string strName;
-    bool isComputer;
-    CGrid gridOwn;
-    CGrid gridTracking;
+    string m_strName;
+    bool m_isComputer;
+    CGrid m_gridOwn;
+    CGrid m_gridTracking;
 
     void ManualShipPlacement();
     void RandomShipPlacement();

@@ -18,8 +18,8 @@ struct CCell {
 
 class CGrid {
 private:
-    CCell arrCells[GRID_SIZE][GRID_SIZE]; // TF: Array
-    vector<CShip*> vecpShips;
+    CCell m_arrCells[GRID_SIZE][GRID_SIZE]; // TF: Array
+    vector<CShip*> m_vecpShips;
 
     // Check if a ship can be placed at a given position
     bool IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal) const;

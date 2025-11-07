@@ -1,12 +1,12 @@
 #include "Game.h"
 
-CGame::CGame() : bDebugMode(false) {
-	pHuman = new CPlayer("Player", false); // TF: Pointer Initialised, TF: Class Instance, // TF: Dynamic Memory
-	pComputer = new CPlayer("Computer", true); 
+CGame::CGame() : m_bDebugMode(false) {
+	m_pHuman = new CPlayer("Player", false); // TF: Pointer Initialised, TF: Class Instance, // TF: Dynamic Memory
+	m_pComputer = new CPlayer("Computer", true); 
 }
 CGame::~CGame() {
-	delete pHuman; // TF: Dynamic Memory
-    delete pComputer;
+	delete m_pHuman; // TF: Dynamic Memory
+    delete m_pComputer;
 }
 void CGame::Run() {
     bool bRunning = true;
@@ -38,7 +38,7 @@ void CGame::ShowMainMenu() const {
     DrawBorder();
     CenterTextColored("======= BATTLESHIPS =======", 2, CONSOLE_WIDTH, COLOUR_CYAN_ON_BLACK);
     CenterText("1. Start New Game", 5, CONSOLE_WIDTH);
-    CenterText("2. Toggle Debug Mode (" + string(bDebugMode ? "ON" : "OFF") + ")", 6, CONSOLE_WIDTH);
+    CenterText("2. Toggle Debug Mode (" + string(m_bDebugMode ? "ON" : "OFF") + ")", 6, CONSOLE_WIDTH);
     CenterText("3. Exit", 7, CONSOLE_WIDTH);
 	CenterTextColored("---------------------------------", 9, CONSOLE_WIDTH, COLOUR_BLUE_ON_BLACK);
 }
@@ -52,16 +52,16 @@ void CGame::ShowShipPlacementMenu() const {
 }
 // Toggle debug mode on/off
 void CGame::ToggleDebugMode() {
-    bDebugMode = !bDebugMode;
+    m_bDebugMode = !m_bDebugMode;
 }
 // Start a new game
 void CGame::StartNewGame() {
     ClearScreen();
 	// Delete previous objects and create a new one
-    delete pHuman;
-    delete pComputer;
-    pHuman = new CPlayer("Player", false);
-    pComputer = new CPlayer("Computer", true);
+    delete m_pHuman;
+    delete m_pComputer;
+    m_pHuman = new CPlayer("Player", false);
+    m_pComputer = new CPlayer("Computer", true);
 
     ShowShipPlacementMenu();
     int iSetupChoice = GetValidPlacementMenuChoice((CONSOLE_WIDTH - 72), 9);
@@ -69,8 +69,8 @@ void CGame::StartNewGame() {
 
     ClearInputArea(CONSOLE_WIDTH - 2, 10, 1, 15);
 
-    pHuman->SetupShips(bManual);
-    pComputer->SetupShips(false);
+    m_pHuman->SetupShips(bManual);
+    m_pComputer->SetupShips(false);
     
     ClearScreen();
     bool isGameOver = false;
@@ -78,16 +78,16 @@ void CGame::StartNewGame() {
     while (!isGameOver) {
         DrawBorder();
 
-        pHuman->ShowGrids(bDebugMode, 30, 5);
-		pComputer->ShowGrids(bDebugMode, 50, 5);
+        m_pHuman->ShowGrids(m_bDebugMode, 30, 5);
+		m_pComputer->ShowGrids(m_bDebugMode, 50, 5);
 
 		// TF: Pointer Dereference
 		// TF: Reference
-        isGameOver = pHuman->TakeTurn(*pComputer, 32, 18);
+        isGameOver = m_pHuman->TakeTurn(*m_pComputer, 32, 18);
         if (isGameOver) break;
 
-        pComputer->TakeTurn(*pHuman, 32, 20);
-        isGameOver = pHuman->HasLost();
+        m_pComputer->TakeTurn(*m_pHuman, 32, 20);
+        isGameOver = m_pHuman->HasLost();
     }
 
     ClearScreen();
@@ -100,7 +100,7 @@ void CGame::ShowGameOver() {
     
     CenterTextColored("========= GAME OVER =========", 2, CONSOLE_WIDTH, COLOUR_YELLOW_ON_BLACK);
 	// Display victory or defeat message
-    if (pHuman->HasLost()) {
+    if (m_pHuman->HasLost()) {
         CenterTextColored("Defeat! The Computer sunk your fleet.", 5, CONSOLE_WIDTH, COLOUR_RED_ON_BLACK);
     }
     else {

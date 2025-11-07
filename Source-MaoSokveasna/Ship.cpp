@@ -1,9 +1,9 @@
 #include "Ship.h"
 
-CShip::CShip(string _strName, int _iSize) : strName(_strName), iSize(_iSize), iHits(0) {}
-CShip::CShip(const CShip& CShipOther) : strName(CShipOther.strName), iSize(CShipOther.iSize), iHits(CShipOther.iHits) {}
+CShip::CShip(string _m_strName, int _m_iSize) : m_strName(_m_strName), m_iSize(_m_iSize), m_iHits(0) {}
+CShip::CShip(const CShip& CShipOther) : m_strName(CShipOther.m_strName), m_iSize(CShipOther.m_iSize), m_iHits(CShipOther.m_iHits) {}
 
-string CShip::GetName() const { return strName; }
-int CShip::GetSize() const { return iSize; }
-bool CShip::IsSunk() const { return iHits >= iSize; } // TF: Relational Operator
-void CShip::RegisterHit() { iHits++; } // TF: Arithmetic Operator
+string CShip::GetName() const { return m_strName; }
+int CShip::GetSize() const { return m_iSize; }
+bool CShip::IsSunk() const { return m_iHits >= m_iSize; } // TF: Relational Operator
+void CShip::RegisterHit() { m_iHits++; } // TF: Arithmetic Operator

@@ -4,29 +4,29 @@ CGrid::CGrid() {
     // Initialize all cells to empty and no ship
     for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
         for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
-            arrCells[iRow][iCol].eState = CS_EMPTY;
-            arrCells[iRow][iCol].pShip = nullptr;
+            m_arrCells[iRow][iCol].eState = CS_EMPTY;
+            m_arrCells[iRow][iCol].pShip = nullptr;
         }
     }
 }
 // Copy constructor
 CGrid::CGrid(const CGrid& gridOther) {
-    for (CShip* pShip : gridOther.vecpShips) {
-        vecpShips.push_back(new CShip(*pShip));
+    for (CShip* pShip : gridOther.m_vecpShips) {
+        m_vecpShips.push_back(new CShip(*pShip));
     }
 
     // Copy cell states and relink ship pointers
     for (int iRow = 0; iRow < GRID_SIZE; ++iRow) {
         for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
-            arrCells[iRow][iCol].eState = gridOther.arrCells[iRow][iCol].eState;
-            arrCells[iRow][iCol].pShip = nullptr;
+            m_arrCells[iRow][iCol].eState = gridOther.m_arrCells[iRow][iCol].eState;
+            m_arrCells[iRow][iCol].pShip = nullptr;
 
-            CShip* pOriginalShip = gridOther.arrCells[iRow][iCol].pShip;
+            CShip* pOriginalShip = gridOther.m_arrCells[iRow][iCol].pShip;
             if (pOriginalShip) {
-                for (CShip* pCopyShip : vecpShips) {
+                for (CShip* pCopyShip : m_vecpShips) {
                     if (pCopyShip->GetName() == pOriginalShip->GetName() &&
                         pCopyShip->GetSize() == pOriginalShip->GetSize()) {
-                        arrCells[iRow][iCol].pShip = pCopyShip;
+                        m_arrCells[iRow][iCol].pShip = pCopyShip;
                         break;
                     }
                 }
@@ -36,7 +36,7 @@ CGrid::CGrid(const CGrid& gridOther) {
 }
 
 CGrid::~CGrid() {
-    for (CShip* pShip : vecpShips) {
+    for (CShip* pShip : m_vecpShips) {
 		delete pShip; // TF: Pointer Dereference
     }
 }
@@ -47,13 +47,13 @@ bool CGrid::IsValidPlacement(CShip* pShip, int iRow, int iCol, bool bHorizontal)
 		// TF: Arithmetic Operator
         if (iCol + iLength > GRID_SIZE) return false;
         for (int i = 0; i < iLength; ++i) {
-            if (arrCells[iRow][iCol + i].eState != CS_EMPTY) return false;
+            if (m_arrCells[iRow][iCol + i].eState != CS_EMPTY) return false;
         }
     }
     else {
         if (iRow + iLength > GRID_SIZE) return false;
         for (int i = 0; i < iLength; ++i) {
-            if (arrCells[iRow + i][iCol].eState != CS_EMPTY) return false;
+            if (m_arrCells[iRow + i][iCol].eState != CS_EMPTY) return false;
         }
     }
     return true;
@@ -66,16 +66,16 @@ bool CGrid::PlaceShip(CShip* pShip, int iRow, int iCol, bool bHorizontal) {
     for (int i = 0; i < iLength; ++i) {
         int r = iRow + (bHorizontal ? 0 : i);
         int c = iCol + (bHorizontal ? i : 0);
-        arrCells[r][c].eState = CS_SHIP;
-        arrCells[r][c].pShip = pShip;
+        m_arrCells[r][c].eState = CS_SHIP;
+        m_arrCells[r][c].pShip = pShip;
     }
 
-    vecpShips.push_back(pShip);
+    m_vecpShips.push_back(pShip);
     return true;
 }
 
 bool CGrid::FireAt(int iRow, int iCol, bool& bHit, bool& bSunk, string& strShipName) {
-	CCell& cell = arrCells[iRow][iCol]; // TF: Reference
+	CCell& cell = m_arrCells[iRow][iCol]; // TF: Reference
 
     if (cell.eState == CS_HIT || cell.eState == CS_MISS) return false;
 
@@ -106,7 +106,7 @@ void CGrid::Display(bool bShowShips, int nStartX, int nStartY) const {
 
         for (int iCol = 0; iCol < GRID_SIZE; ++iCol) {
             char cSymbol = '.';
-            const CCell& cell = arrCells[iRow][iCol];
+            const CCell& cell = m_arrCells[iRow][iCol];
 
             if (cell.eState == CS_HIT) {
                 SetRgb(COLOUR_RED_ON_BLACK); 
@@ -131,17 +131,17 @@ void CGrid::Display(bool bShowShips, int nStartX, int nStartY) const {
 }
 
 bool CGrid::IsAllShipsSunk() const {
-    for (CShip* pShip : vecpShips) {
+    for (CShip* pShip : m_vecpShips) {
         if (!pShip->IsSunk()) return false;
     }
     return true;
 }
 
 void CGrid::MarkTrackingCell(int iRow, int iCol, bool bHit) {
-    arrCells[iRow][iCol].eState = bHit ? CS_HIT : CS_MISS;
+    m_arrCells[iRow][iCol].eState = bHit ? CS_HIT : CS_MISS;
 }
 
 bool CGrid::IsCellUntouched(int iRow, int iCol) const {
-    CellState eState = arrCells[iRow][iCol].eState;
+    CellState eState = m_arrCells[iRow][iCol].eState;
     return eState != CS_HIT && eState != CS_MISS;
 }

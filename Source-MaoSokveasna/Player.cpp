@@ -1,18 +1,18 @@
 #include "Player.h"
 
 
-CPlayer::CPlayer() : strName("Player"), isComputer(false) {
+CPlayer::CPlayer() : m_strName("Player"), m_isComputer(false) {
     srand(static_cast<unsigned>(time(nullptr))); // TF: Pesudo Random Number
 }
-CPlayer::CPlayer(string _strName, bool _isComputer) : strName(_strName), isComputer(_isComputer) {
+CPlayer::CPlayer(string _m_strName, bool _m_isComputer) : m_strName(_m_strName), m_isComputer(_m_isComputer) {
 	srand(static_cast<unsigned>(time(nullptr))); // TF: Pesudo Random Number
 }
 
-string CPlayer::GetName() const { return strName; }
+string CPlayer::GetName() const { return m_strName; }
 
 void CPlayer::SetupShips(bool bManual) {
 	// TF: Logical Operator
-    if (bManual && !isComputer) ManualShipPlacement();
+    if (bManual && !m_isComputer) ManualShipPlacement();
     else RandomShipPlacement();
 }
 
@@ -22,14 +22,14 @@ void CPlayer::ManualShipPlacement() {
     const int kMessageY = 16;
 
     GotoXY(40, 2);
-    cout << strName << ", place your ships manually.\n";
+    cout << m_strName << ", place your ships manually.\n";
 
     for (int iShip = 0; iShip < 5; ++iShip) {
         bool bPlaced = false;
 
         while (!bPlaced) {
             SetRgbLine(COLOUR_WHITE_ON_BLACK, "Current Grid:", 20, 5);
-            gridOwn.Display(true, 18, 6);
+            m_gridOwn.Display(true, 18, 6);
 
             GotoXY(kInputX, kInputY);
             cout << "Place " << SHIP_NAMES[iShip] << " (size " << SHIP_SIZES[iShip] << "): ";
@@ -55,7 +55,7 @@ void CPlayer::ManualShipPlacement() {
             }
 
             CShip* pShip = new CShip(SHIP_NAMES[iShip], SHIP_SIZES[iShip]);
-            bPlaced = gridOwn.PlaceShip(pShip, iRow, iCol, bHorizontal);
+            bPlaced = m_gridOwn.PlaceShip(pShip, iRow, iCol, bHorizontal);
 
             if (!bPlaced) {
                 SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid placement (overlap or out of bounds). Try again.", kInputX, kMessageY);
@@ -81,7 +81,7 @@ void CPlayer::RandomShipPlacement() {
             bool bHorizontal = rand() % 2;
 
             CShip* pShip = new CShip(SHIP_NAMES[iShip], SHIP_SIZES[iShip]);
-            bPlaced = gridOwn.PlaceShip(pShip, iRow, iCol, bHorizontal);
+            bPlaced = m_gridOwn.PlaceShip(pShip, iRow, iCol, bHorizontal);
 
             if (!bPlaced) delete pShip;
         }
@@ -99,16 +99,16 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
     static int iLastCol = -1;
 
     while (!bValid) {
-        if (isComputer) {
+        if (m_isComputer) {
 			// AI determines the next target
-            pair<int, int> target = ai.GetNextTarget(bLastHit, iLastRow, iLastCol, gridTracking);
+            pair<int, int> target = ai.GetNextTarget(bLastHit, iLastRow, iLastCol, m_gridTracking);
             iRow = target.first;
             iCol = target.second;
         }
         else {
             string strCoordinate;
             GotoXY(iStartX, iStartY);
-            cout << strName << ", enter target coordinate (e.g., B7): ";
+            cout << m_strName << ", enter target coordinate (e.g., B7): ";
             cin >> strCoordinate;
             ClearInputLine(CONSOLE_WIDTH - 50, iStartX, iStartY);
 
@@ -122,17 +122,17 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
         bool bSunk = false;
         string strShipName;
 
-        bValid = opponent.gridOwn.FireAt(iRow, iCol, bHit, bSunk, strShipName);
+        bValid = opponent.m_gridOwn.FireAt(iRow, iCol, bHit, bSunk, strShipName);
         if (bValid) {
-            gridTracking.MarkTrackingCell(iRow, iCol, bHit);
+            m_gridTracking.MarkTrackingCell(iRow, iCol, bHit);
             ClearInputArea(CONSOLE_WIDTH, iStartX, iStartY + 1, 3);
             GotoXY(iStartX, iStartY + 2);
-            cout << strName << " fired at " << char('A' + iCol) << iRow + 1 << ": ";
+            cout << m_strName << " fired at " << char('A' + iCol) << iRow + 1 << ": ";
 
             if (bHit) {
                 SetRgbLine(COLOUR_YELLOW_ON_BLACK, "Hit!", iStartX + 23, iStartY + 2);
                 if (bSunk) {
-                    if (!isComputer) {
+                    if (!m_isComputer) {
                         SetRgbLine(COLOUR_GREEN_ON_BLACK, "You sunk the " + strShipName + "!", iStartX, iStartY + 1);
                     }
                     else {
@@ -144,14 +144,14 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
                 SetRgbLine(COLOUR_RED_ON_BLACK, "Miss.", iStartX + 23, iStartY + 2);
             }
 
-            if (isComputer) {
+            if (m_isComputer) {
                 bLastHit = bHit;
                 iLastRow = iRow;
                 iLastCol = iCol;
             }
         }
         else {
-            if (!isComputer) {
+            if (!m_isComputer) {
                 SetRgbLine(COLOUR_RED_ON_BLACK, "Invalid or repeated target. Try again.", iStartX, iStartY + 1);
             }
         }
@@ -160,7 +160,7 @@ bool CPlayer::TakeTurn(CPlayer& opponent, int iStartX, int iStartY) {
 }
 
 bool CPlayer::HasLost() const {
-    return gridOwn.IsAllShipsSunk();
+    return m_gridOwn.IsAllShipsSunk();
 }
 
 void CPlayer::ShowGrids(bool bDebugMode, int iStartX, int iStartY) const {
@@ -169,27 +169,27 @@ void CPlayer::ShowGrids(bool bDebugMode, int iStartX, int iStartY) const {
 	// Lambda function to show a grid
     auto ShowGrid = [&](const string& title, const CGrid& grid, bool bShowShips, int iOffset) {
         GotoXY(iStartX + iOffset, iStartY);
-        cout << strName << "'s " << title << ":\n";
+        cout << m_strName << "'s " << title << ":\n";
         grid.Display(bShowShips, iStartX + iOffset - 1, iStartY + 1);
     };
 
     // In debug mode ON, show computer grid as well
     if (bDebugMode) {
         // Player: Own Left, Tracking Right
-        if (!isComputer) {
-            ShowGrid("Own Grid", gridOwn, true, -22);
-            ShowGrid("Tracking Grid", gridTracking, false, iGridSpacing - 22);
+        if (!m_isComputer) {
+            ShowGrid("Own Grid", m_gridOwn, true, -22);
+            ShowGrid("Tracking Grid", m_gridTracking, false, iGridSpacing - 22);
         }
         // Computer: Tracking Left, Own Right
         else {
-            ShowGrid("Tracking Grid", gridTracking, false, 17);
-            ShowGrid("Own Grid", gridOwn, true, iGridSpacing + 17);
+            ShowGrid("Tracking Grid", m_gridTracking, false, 17);
+            ShowGrid("Own Grid", m_gridOwn, true, iGridSpacing + 17);
         }
     }
     else {
-        if (!isComputer) {
-            ShowGrid("Tracking Grid", gridTracking, false, 1);
-            ShowGrid("Own Grid", gridOwn, true, iGridSpacing + 1);
+        if (!m_isComputer) {
+            ShowGrid("Tracking Grid", m_gridTracking, false, 1);
+            ShowGrid("Own Grid", m_gridOwn, true, iGridSpacing + 1);
         }
     }
 }

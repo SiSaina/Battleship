@@ -9,9 +9,9 @@ using namespace std;
 
 class AI {
 private:
-    vector<pair<int, int>> vecAvailableTargets; // All remaining valid targets
-    vector<pair<int, int>> vecTargetQueue;      // Targets to prioritize after a hit
-    bool bHuntMode;                             // True if AI is hunting for new ships
+    vector<pair<int, int>> m_vecAvailableTargets; // All remaining valid targets
+    vector<pair<int, int>> m_vecTargetQueue;      // Targets to prioritize after a hit
+    bool m_bHuntMode;                             // True if AI is hunting for new ships
 
     // Initialize all possible targets (0-9 rows, 0-9 cols) and shuffle them
     void InitializeTargets();

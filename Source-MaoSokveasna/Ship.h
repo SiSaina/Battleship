@@ -12,9 +12,9 @@ using namespace std;
 
 class CShip {
 private:
-    string strName;
-    int iSize;
-    int iHits;
+    string m_strName;
+    int m_iSize;
+    int m_iHits;
 public:
     CShip(string _strName, int _iSize); // TF: Constructor
     CShip(const CShip& shipOther); // TF: Copy Constructor

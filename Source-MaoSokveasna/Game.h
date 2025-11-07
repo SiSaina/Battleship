@@ -4,9 +4,9 @@
 
 class CGame { // TF: Class
 private: // TF: Access Specifier
-	CPlayer* pHuman; // TF: Pointer Initialised
-	CPlayer* pComputer;
-	bool bDebugMode; // TF: Variable Type
+	CPlayer* m_pHuman; // TF: Pointer Initialised
+	CPlayer* m_pComputer;
+	bool m_bDebugMode; // TF: Variable Type
 
     void ShowMainMenu() const; // TF: Constant Member Function
     void ShowShipPlacementMenu() const;
